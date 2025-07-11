@@ -118,6 +118,7 @@ class ClientController extends Controller
     public function show($id)
     {
         $client = Client::findOrFail($id);
+        $this->authorize('view', $client);
         return response()->json($client);
     }
 
@@ -159,6 +160,7 @@ class ClientController extends Controller
     public function update(UpdateClientRequest $request, $id)
     {
         $client = Client::findOrFail($id);
+        $this->authorize('update', $client);
         $client->update($request->validated());
         return response()->json($client);
     }
@@ -184,6 +186,7 @@ class ClientController extends Controller
     public function destroy($id)
     {
         $client = Client::findOrFail($id);
+        $this->authorize('delete', $client);
         $client->delete();
         return response()->json(null, 204);
     }

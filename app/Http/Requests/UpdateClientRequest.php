@@ -27,7 +27,7 @@ class UpdateClientRequest extends FormRequest
             'email' => [
                 'required',
                 'email',
-                Rule::unique('clients', 'email')->ignore($this->route('id')),
+                Rule::unique('clients', 'email')->ignore($this->route('client')),
             ],
 
         ];

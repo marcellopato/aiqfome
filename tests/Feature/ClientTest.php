@@ -72,10 +72,9 @@ class ClientTest extends TestCase
 
     public function test_remover_cliente()
     {
-        $novo = Client::factory()->create(['email' => 'remover@teste.com']);
-        $response = $this->deleteJson("/api/clients/{$novo->id}");
+        $response = $this->deleteJson("/api/clients/{$this->client->id}");
         $response->assertStatus(204);
-        $this->assertDatabaseMissing('clients', ['id' => $novo->id]);
+        $this->assertDatabaseMissing('clients', ['id' => $this->client->id]);
     }
 
     public function test_validacao_campos_obrigatorios()

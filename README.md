@@ -1,66 +1,160 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# API aiqfome Favoritos
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API RESTful para gerenciamento de clientes e produtos favoritos, com autenticação, roles/permissões (Spatie), integração com API externa de produtos, documentação Swagger e testes automatizados.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Clonando o projeto
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```bash
+git clone https://github.com/marcellopato/aiqfome.git
+cd aiqfome
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Requisitos
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- [Composer](https://getcomposer.org/)
+- [Docker](https://www.docker.com/) (recomendado para ambiente local)
+- [Laravel Sail](https://laravel.com/docs/10.x/sail) (opcional, mas recomendado)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Subindo o ambiente com Docker/Sail
 
-## Laravel Sponsors
+```bash
+# Instale as dependências
+composer install
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Copie o .env de exemplo e configure as variáveis se necessário
+cp .env.example .env
 
-### Premium Partners
+# Gere a key do Laravel
+php artisan key:generate
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+# Suba os containers
+./vendor/bin/sail up -d
 
-## Contributing
+# Rode as migrations e seeders
+./vendor/bin/sail artisan migrate --seed
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Credenciais de acesso
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- As credenciais de usuários seedados podem ser encontradas no arquivo de seeder ou conforme configurado no banco de dados após rodar os seeders.
+- Por padrão, consulte o seeder `DatabaseSeeder.php` para ver e-mails e senhas criados.
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Documentação Swagger
 
-## License
+- Acesse a documentação interativa em:  
+  ```
+  http://localhost/api/documentation
+  ```
+- O arquivo JSON da documentação pode ser acessado em:  
+  ```
+  http://localhost/docs?api-docs.json
+  ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## Testes
+
+Para rodar todos os testes automatizados:
+
+```bash
+./vendor/bin/sail artisan test
+```
+ou, se não estiver usando Sail:
+```bash
+php artisan test
+```
+
+---
+
+## Endpoints principais
+
+- Autenticação: `/api/login`
+- CRUD de clientes: `/api/clients`
+- Favoritos: `/api/clients/{client}/favorites`
+- Listar produtos (proxy): `/api/products`
+
+---
+
+## Links úteis
+
+- [Repositório no GitHub](https://github.com/marcellopato/aiqfome)
+- [Documentação oficial do Laravel](https://laravel.com/docs/)
+- [Documentação do Spatie Permissions](https://spatie.be/docs/laravel-permission/v5/introduction)
+- [Fake Store API (produtos)](https://fakestoreapi.com/docs)
+
+---
+
+## Observações
+
+- O projeto utiliza autenticação via Sanctum.
+- Roles e permissões são gerenciadas pelo pacote Spatie.
+- Testes automatizados cobrem autenticação, CRUD, favoritos, roles/permissões e proteção de rotas.
+
+---
+
+## Resultados dos testes automatizados
+
+```sh
+# php artisan test
+
+   PASS  Tests\Unit\ExampleTest
+  ✓ that true is true  0.14s  
+
+   PASS  Tests\Feature\Auth\AuthenticationTest
+  ✓ users can authenticate using the login screen  7.43s  
+  ✓ users can not authenticate with invalid password  0.51s  
+  ✓ users can logout  0.20s  
+
+   PASS  Tests\Feature\Auth\EmailVerificationTest
+  ✓ email can be verified  0.24s  
+  ✓ email is not verified with invalid hash  0.53s  
+
+   PASS  Tests\Feature\Auth\PasswordResetTest
+  ✓ reset password link can be requested  0.65s  
+  ✓ password can be reset with valid token  0.26s  
+
+   PASS  Tests\Feature\Auth\RegistrationTest
+  ✓ new users can register  0.19s  
+
+   PASS  Tests\Feature\AuthProtectionTest
+  ✓ nao autenticado nao acessa rotas protegidas  0.17s  
+  ✓ nao autenticado nao acessa favoritos  0.18s  
+  ✓ token invalido nao acessa rotas protegidas  0.24s  
+  ✓ rota publica login funciona sem autenticacao  0.42s  
+
+   PASS  Tests\Feature\ClientTest
+  ✓ criar cliente valido  0.22s  
+  ✓ nao permite email duplicado  0.19s  
+  ✓ listar clientes  0.14s  
+  ✓ exibir cliente especifico  0.27s  
+  ✓ atualizar cliente  0.18s  
+  ✓ remover cliente  0.17s  
+  ✓ validacao campos obrigatorios  0.17s  
+
+   PASS  Tests\Feature\ExampleTest
+  ✓ the application returns a successful response  0.18s  
+
+   PASS  Tests\Feature\FavoriteTest
+  ✓ adicionar favorito valido  0.48s  
+  ✓ nao permite favorito duplicado  0.80s  
+  ✓ nao adiciona favorito invalido  0.14s  
+  ✓ listar favoritos retorna apenas validos  1.39s  
+  ✓ remover favorito  0.75s  
+
+   PASS  Tests\Feature\RolePermissionTest
+  ✓ manager pode crud qualquer cliente  0.27s  
+  ✓ user so pode acessar editar remover proprio registro  0.18s  
+
+  Tests:    28 passed (72 assertions)
+  Duration: 18.36s
+```

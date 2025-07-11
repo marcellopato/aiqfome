@@ -23,7 +23,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="title", type="string", example="Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops"),
  *     @OA\Property(property="image", type="string", example="https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"),
  *     @OA\Property(property="price", type="number", format="float", example=109.95),
- *     @OA\Property(property="review", type="string", example="Produto excelente!"),
+ *     @OA\Property(property="review", type="object", example={"rate": 3.9, "count": 120}),
  * )
  */
 class FavoriteController extends Controller
@@ -51,12 +51,20 @@ class FavoriteController extends Controller
     {
         $client = Client::findOrFail($clientId);
         $favorites = $client->favorites()->get();
-        // Buscar detalhes dos produtos na API externa
         $products = collect();
         foreach ($favorites as $favorite) {
             $response = Http::get('https://fakestoreapi.com/products/' . $favorite->product_id);
             if ($response->ok()) {
-                $products->push($response->json());
+                $data = $response->json();
+                if (isset($data['id'], $data['title'], $data['image'], $data['price'])) {
+                    $products->push([
+                        'id' => $data['id'],
+                        'title' => $data['title'],
+                        'image' => $data['image'],
+                        'price' => $data['price'],
+                        'review' => $data['rating'] ?? null,
+                    ]);
+                }
             }
         }
         return response()->json($products);
@@ -103,11 +111,13 @@ class FavoriteController extends Controller
         }
         // Valida produto na API externa
         $response = Http::get('https://fakestoreapi.com/products/' . $productId);
-        if (!$response->ok()) {
+        $data = $response->json();
+        if (!$response->ok() || !isset($data['id'], $data['title'], $data['image'], $data['price'])) {
             return response()->json(['message' => 'Produto não encontrado na API externa.'], 404);
         }
-        $favorite = $client->favorites()->create(['product_id' => $productId]);
-        return response()->json($favorite, 201);
+        $client->favorites()->create(['product_id' => $productId]);
+        // Retorna os dados completos do produto favorito
+        return response()->json($data, 201);
     }
 
     /**
@@ -138,5 +148,32 @@ class FavoriteController extends Controller
         }
         $favorite->delete();
         return response()->json(null, 204);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/products",
+     *     tags={"Favorites"},
+     *     summary="Listar todos os produtos disponíveis (proxy da Fake Store API)",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de produtos",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/FavoriteProduct"))
+     *     ),
+     *     @OA\Response(
+     *         response=502,
+     *         description="Erro ao integrar com a API externa",
+     *         @OA\JsonContent(@OA\Property(property="message", type="string", example="Erro ao buscar produtos na API externa."))
+     *     )
+     * )
+     */
+    public function listProducts()
+    {
+        $response = \Illuminate\Support\Facades\Http::get('https://fakestoreapi.com/products');
+        if (!$response->ok()) {
+            return response()->json(['message' => 'Erro ao buscar produtos na API externa.'], 502);
+        }
+        return response()->json($response->json());
     }
 }

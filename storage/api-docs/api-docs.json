@@ -556,6 +556,51 @@
                     }
                 ]
             }
+        },
+        "/api/products": {
+            "get": {
+                "tags": [
+                    "Favorites"
+                ],
+                "summary": "Listar todos os produtos disponíveis (proxy da Fake Store API)",
+                "operationId": "65ae51c001b0473ce34b62338b78f99f",
+                "responses": {
+                    "200": {
+                        "description": "Lista de produtos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/FavoriteProduct"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Erro ao integrar com a API externa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erro ao buscar produtos na API externa."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -621,8 +666,11 @@
                         "example": 109.95
                     },
                     "review": {
-                        "type": "string",
-                        "example": "Produto excelente!"
+                        "type": "object",
+                        "example": {
+                            "rate": 3.9,
+                            "count": 120
+                        }
                     }
                 },
                 "type": "object"
